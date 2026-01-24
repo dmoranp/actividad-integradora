@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Supermercado</title>
+    <!-- Enlace al archivo de estilos -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Encabezado de la aplicación -->
+    <header>
+        <h1>Mi Lista de Supermercado</h1>
+    </header>
+
+    <!-- Contenido principal -->
+    <main>
+        <!-- Sección del formulario para agregar productos -->
+        <section id="formulario-section">
+            <h2>Agregar Producto</h2>
+            <form id="form-producto">
+                <div class="form-group">
+                    <label for="nombre-producto">Nombre del producto:</label>
+                    <input type="text" id="nombre-producto" name="nombre" placeholder="Ej: Leche">
+                </div>
+                <div class="form-group">
+                    <label for="cantidad-producto">Cantidad:</label>
+                    <input type="number" id="cantidad-producto" name="cantidad" min="1" placeholder="1">
+                </div>
+                <button type="submit" id="btn-agregar">Agregar</button>
+            </form>
+            <!-- Contenedor para mensajes de error -->
+            <div id="mensaje-error" class="error-mensaje"></div>
+        </section>
+
+        <!-- Sección de la lista de productos -->
+        <section id="lista-section">
+            <h2>Productos</h2>
+            <!-- Contenedor de contadores -->
+            <div id="contadores" class="contadores">
+                <span>Total: <strong id="contador-total">0</strong></span>
+                <span>Comprados: <strong id="contador-comprados">0</strong></span>
+                <span>Pendientes: <strong id="contador-pendientes">0</strong></span>
+            </div>
+            <!-- Lista dinámica de productos -->
+            <ul id="lista-productos" class="lista-productos"></ul>
+        </section>
+    </main>
+
+    <!-- Pie de página -->
+    <footer>
+        <p>&copy; 2025 - Lista de Supermercado | Desarrollado por Denny Javier Morán Pérez</p>
+    </footer>
+
+    <!-- Enlace al archivo de JavaScript -->
+    <script src="js/script.js"></script>
+</body>
+</html>
