@@ -16,6 +16,10 @@ Aplicación web funcional que permite gestionar una lista de compras de supermer
 - **CSS3**: Estilos y diseño visual
 - **JavaScript**: Lógica de la aplicación
 
+### Recursos Externos
+
+- **Google Fonts**: Fuente [Poppins](https://fonts.google.com/specimen/Poppins) para tipografía del proyecto
+
 ---
 
 ## Declaración de Uso de Inteligencia Artificial

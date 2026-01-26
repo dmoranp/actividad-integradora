@@ -1,0 +1,206 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Encabezado */
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 1.8rem;
+}
+
+/* Contenido principal */
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    gap: 1.5rem;
+}
+
+/* Secciones tipo card */
+section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+section h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+/* Botón agregar */
+#btn-agregar {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#btn-agregar:hover {
+    background-color: #2980b9;
+}
+
+#btn-agregar:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+/* Mensaje de error */
+.error-mensaje {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    min-height: 1.2rem;
+}
+
+/* Contadores */
+.contadores {
+    display: flex;
+    justify-content: space-between;
+    background-color: #ecf0f1;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.contadores span {
+    color: #555;
+}
+
+.contadores strong {
+    color: #2c3e50;
+}
+
+/* Lista de productos */
+.lista-productos {
+    list-style: none;
+}
+
+.lista-productos li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s;
+}
+
+.lista-productos li:hover {
+    background-color: #f9f9f9;
+}
+
+/* Producto comprado */
+.lista-productos li.comprado {
+    background-color: #d5f4e6;
+    opacity: 0.8;
+}
+
+.lista-productos li.comprado .producto-info {
+    text-decoration: line-through;
+    color: #888;
+}
+
+/* Información del producto */
+.producto-info {
+    flex: 1;
+    cursor: pointer;
+}
+
+.producto-nombre {
+    font-weight: 500;
+    color: #333;
+}
+
+.producto-cantidad {
+    font-size: 0.85rem;
+    color: #777;
+    margin-left: 0.5rem;
+}
+
+/* Botón eliminar */
+.btn-eliminar {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.3s;
+}
+
+.btn-eliminar:hover {
+    background-color: #c0392b;
+}
+
+.btn-eliminar:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+}
+
+/* Pie de página */
+footer {
+    background-color: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
