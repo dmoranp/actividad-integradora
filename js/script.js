@@ -14,7 +14,7 @@ const STORAGE_KEY = 'listaSupermercado';
 let productos = [];
 
 // Imagen por defecto cuando no se proporciona una URL
-const IMAGEN_DEFAULT = 'img/placeholder.png';
+const IMAGEN_DEFAULT = 'img/placeholder.jpg';
 
 // ============================================
 // REFERENCIAS AL DOM
