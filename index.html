@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplicación web para gestionar tu lista de compras del supermercado. Agrega, elimina y marca productos como comprados.">
+    <meta name="keywords" content="lista de compras, supermercado, organizar compras, lista de supermercado">
+    <meta name="author" content="Denny Javier Morán Pérez">
+    <meta name="theme-color" content="#2c3e50">
     <title>Lista de Supermercado</title>
     <!-- Fuente externa de Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,6 +56,10 @@
             </div>
             <!-- Lista dinámica de productos -->
             <ul id="lista-productos" class="lista-productos"></ul>
+            <!-- Mensaje cuando la lista está vacía -->
+            <p id="mensaje-vacio" class="mensaje-vacio">Tu lista está vacía. ¡Agrega tu primer producto!</p>
+            <!-- Botón para vaciar toda la lista -->
+            <button id="btn-vaciar" class="btn-vaciar">Vaciar lista</button>
         </section>
     </main>
 

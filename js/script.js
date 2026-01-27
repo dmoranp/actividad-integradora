@@ -29,6 +29,8 @@ const listaProductos = document.getElementById('lista-productos');
 const contadorTotal = document.getElementById('contador-total');
 const contadorComprados = document.getElementById('contador-comprados');
 const contadorPendientes = document.getElementById('contador-pendientes');
+const mensajeVacio = document.getElementById('mensaje-vacio');
+const btnVaciar = document.getElementById('btn-vaciar');
 
 // ============================================
 // FUNCIONES DE LOCALSTORAGE
@@ -155,7 +157,32 @@ function eliminarProducto(id) {
     }
 
     actualizarContadores();
+    actualizarVisibilidadLista();
     console.log('[Producto] Producto eliminado exitosamente. Total de productos:', productos.length);
+}
+
+/**
+ * Vacía toda la lista de productos previa confirmación
+ */
+function vaciarLista() {
+    if (productos.length === 0) {
+        console.log('[Lista] La lista ya está vacía');
+        return;
+    }
+
+    const confirmacion = confirm('¿Estás seguro de que deseas vaciar toda la lista?');
+
+    if (confirmacion) {
+        console.log('[Lista] Vaciando lista completa...');
+        productos = [];
+        guardarEnStorage();
+        listaProductos.innerHTML = '';
+        actualizarContadores();
+        actualizarVisibilidadLista();
+        console.log('[Lista] Lista vaciada exitosamente');
+    } else {
+        console.log('[Lista] Vaciado cancelado por el usuario');
+    }
 }
 
 /**
@@ -290,6 +317,21 @@ function actualizarContadores() {
     console.log('[Contadores] Actualizados:', { total, comprados, pendientes });
 }
 
+/**
+ * Muestra u oculta el mensaje de lista vacía y el botón vaciar
+ */
+function actualizarVisibilidadLista() {
+    if (productos.length === 0) {
+        mensajeVacio.classList.add('visible');
+        btnVaciar.classList.remove('visible');
+        console.log('[UI] Mostrando mensaje de lista vacía');
+    } else {
+        mensajeVacio.classList.remove('visible');
+        btnVaciar.classList.add('visible');
+        console.log('[UI] Ocultando mensaje de lista vacía');
+    }
+}
+
 // ============================================
 // FUNCIONES DE FORMULARIO
 // ============================================
@@ -362,6 +404,7 @@ async function manejarEnvioFormulario(evento) {
     limpiarError();
     agregarProducto(nombre, cantidad, imagenBase64);
     limpiarFormulario();
+    actualizarVisibilidadLista();
 }
 
 // ============================================
@@ -386,6 +429,13 @@ function inicializarApp() {
     // Agregar evento al formulario
     formProducto.addEventListener('submit', manejarEnvioFormulario);
     console.log('[App] Evento submit registrado en el formulario');
+
+    // Agregar evento al botón vaciar
+    btnVaciar.addEventListener('click', vaciarLista);
+    console.log('[App] Evento click registrado en botón vaciar');
+
+    // Actualizar visibilidad inicial
+    actualizarVisibilidadLista();
 
     console.log('[App] Aplicación inicializada correctamente');
 }

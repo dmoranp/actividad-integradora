@@ -212,6 +212,47 @@ section h2 {
     box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
 }
 
+/* Mensaje lista vacía */
+.mensaje-vacio {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 2rem 1rem;
+    display: none;
+}
+
+.mensaje-vacio.visible {
+    display: block;
+}
+
+/* Botón vaciar lista */
+.btn-vaciar {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 1rem;
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: none;
+}
+
+.btn-vaciar.visible {
+    display: block;
+}
+
+.btn-vaciar:hover {
+    background-color: #7f8c8d;
+}
+
+.btn-vaciar:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(149, 165, 166, 0.5);
+}
+
 /* Pie de página */
 footer {
     background-color: #2c3e50;
