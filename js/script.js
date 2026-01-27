@@ -13,6 +13,9 @@ const STORAGE_KEY = 'listaSupermercado';
 // Array que contiene todos los productos
 let productos = [];
 
+// Imagen por defecto cuando no se proporciona una URL
+const IMAGEN_DEFAULT = 'img/placeholder.png';
+
 // ============================================
 // REFERENCIAS AL DOM
 // ============================================
@@ -20,6 +23,7 @@ let productos = [];
 const formProducto = document.getElementById('form-producto');
 const inputNombre = document.getElementById('nombre-producto');
 const inputCantidad = document.getElementById('cantidad-producto');
+const inputImagen = document.getElementById('imagen-producto');
 const mensajeError = document.getElementById('mensaje-error');
 const listaProductos = document.getElementById('lista-productos');
 const contadorTotal = document.getElementById('contador-total');
@@ -37,6 +41,7 @@ const contadorPendientes = document.getElementById('contador-pendientes');
  */
 function guardarEnStorage() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
+    console.log('[localStorage] Datos guardados:', productos);
 }
 
 /**
@@ -45,7 +50,9 @@ function guardarEnStorage() {
  */
 function cargarDeStorage() {
     const datos = localStorage.getItem(STORAGE_KEY);
-    return datos ? JSON.parse(datos) : [];
+    const productosRecuperados = datos ? JSON.parse(datos) : [];
+    console.log('[localStorage] Datos cargados:', productosRecuperados);
+    return productosRecuperados;
 }
 
 // ============================================
@@ -59,14 +66,19 @@ function cargarDeStorage() {
  * @returns {string|null} Mensaje de error o null si es válido
  */
 function validarFormulario(nombre, cantidad) {
+    console.log('[Validación] Validando formulario:', { nombre, cantidad });
+
     if (!nombre || nombre.trim() === '') {
+        console.warn('[Validación] Error: Nombre vacío');
         return 'Por favor, ingresa el nombre del producto.';
     }
 
     if (!cantidad || cantidad < 1) {
+        console.warn('[Validación] Error: Cantidad inválida');
         return 'La cantidad debe ser mayor a 0.';
     }
 
+    console.log('[Validación] Formulario válido');
     return null;
 }
 
@@ -76,6 +88,7 @@ function validarFormulario(nombre, cantidad) {
  */
 function mostrarError(mensaje) {
     mensajeError.textContent = mensaje;
+    console.error('[Error] Mostrando error al usuario:', mensaje);
 }
 
 /**
@@ -83,6 +96,7 @@ function mostrarError(mensaje) {
  */
 function limpiarError() {
     mensajeError.textContent = '';
+    console.log('[Error] Mensaje de error limpiado');
 }
 
 // ============================================
@@ -94,26 +108,32 @@ function limpiarError() {
  * @returns {string} ID único
  */
 function generarId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    console.log('[ID] Nuevo ID generado:', id);
+    return id;
 }
 
 /**
  * Agrega un nuevo producto a la lista
  * @param {string} nombre - Nombre del producto
  * @param {number} cantidad - Cantidad del producto
+ * @param {string} imagen - URL de la imagen del producto
  */
-function agregarProducto(nombre, cantidad) {
+function agregarProducto(nombre, cantidad, imagen) {
     const producto = {
         id: generarId(),
         nombre: nombre.trim(),
         cantidad: parseInt(cantidad),
+        imagen: imagen || IMAGEN_DEFAULT,
         comprado: false
     };
 
+    console.log('[Producto] Agregando nuevo producto:', producto);
     productos.push(producto);
     guardarEnStorage();
     renderizarProducto(producto);
     actualizarContadores();
+    console.log('[Producto] Producto agregado exitosamente. Total de productos:', productos.length);
 }
 
 /**
@@ -121,6 +141,9 @@ function agregarProducto(nombre, cantidad) {
  * @param {string} id - ID del producto a eliminar
  */
 function eliminarProducto(id) {
+    const productoEliminado = productos.find(producto => producto.id === id);
+    console.log('[Producto] Eliminando producto:', productoEliminado);
+
     productos = productos.filter(producto => producto.id !== id);
     guardarEnStorage();
 
@@ -128,9 +151,11 @@ function eliminarProducto(id) {
     const elemento = document.querySelector(`[data-id="${id}"]`);
     if (elemento) {
         elemento.remove();
+        console.log('[DOM] Elemento eliminado del DOM');
     }
 
     actualizarContadores();
+    console.log('[Producto] Producto eliminado exitosamente. Total de productos:', productos.length);
 }
 
 /**
@@ -141,12 +166,18 @@ function toggleComprado(id) {
     const producto = productos.find(p => p.id === id);
     if (producto) {
         producto.comprado = !producto.comprado;
+        console.log('[Producto] Estado de compra cambiado:', {
+            nombre: producto.nombre,
+            comprado: producto.comprado
+        });
+
         guardarEnStorage();
 
         // Actualizar clase en el DOM
         const elemento = document.querySelector(`[data-id="${id}"]`);
         if (elemento) {
             elemento.classList.toggle('comprado');
+            console.log('[DOM] Clase "comprado" alternada en el elemento');
         }
 
         actualizarContadores();
@@ -162,6 +193,8 @@ function toggleComprado(id) {
  * @param {Object} producto - Objeto con los datos del producto
  */
 function renderizarProducto(producto) {
+    console.log('[Renderizado] Renderizando producto:', producto.nombre);
+
     // Crear elemento li
     const li = document.createElement('li');
     li.setAttribute('data-id', producto.id);
@@ -169,6 +202,16 @@ function renderizarProducto(producto) {
     if (producto.comprado) {
         li.classList.add('comprado');
     }
+
+    // Crear imagen del producto
+    const img = document.createElement('img');
+    img.classList.add('producto-imagen');
+    img.src = producto.imagen || IMAGEN_DEFAULT;
+    img.alt = producto.nombre;
+    img.onerror = function() {
+        console.warn('[Imagen] Error al cargar imagen, usando placeholder:', producto.imagen);
+        this.src = IMAGEN_DEFAULT;
+    };
 
     // Crear contenedor de información del producto
     const infoDiv = document.createElement('div');
@@ -190,6 +233,7 @@ function renderizarProducto(producto) {
 
     // Evento para marcar como comprado al hacer clic en la info
     infoDiv.addEventListener('click', function() {
+        console.log('[Evento] Click en producto:', producto.nombre);
         toggleComprado(producto.id);
     });
 
@@ -198,21 +242,25 @@ function renderizarProducto(producto) {
     btnEliminar.classList.add('btn-eliminar');
     btnEliminar.textContent = 'Eliminar';
     btnEliminar.addEventListener('click', function() {
+        console.log('[Evento] Click en botón eliminar para:', producto.nombre);
         eliminarProducto(producto.id);
     });
 
     // Agregar elementos al li
+    li.appendChild(img);
     li.appendChild(infoDiv);
     li.appendChild(btnEliminar);
 
     // Agregar li a la lista
     listaProductos.appendChild(li);
+    console.log('[DOM] Producto agregado al DOM:', producto.nombre);
 }
 
 /**
  * Renderiza todos los productos desde el array
  */
 function renderizarTodosLosProductos() {
+    console.log('[Renderizado] Renderizando todos los productos...');
     // Limpiar lista actual
     listaProductos.innerHTML = '';
 
@@ -220,6 +268,7 @@ function renderizarTodosLosProductos() {
     productos.forEach(producto => {
         renderizarProducto(producto);
     });
+    console.log('[Renderizado] Renderizado completo. Total:', productos.length, 'productos');
 }
 
 // ============================================
@@ -237,6 +286,8 @@ function actualizarContadores() {
     contadorTotal.textContent = total;
     contadorComprados.textContent = comprados;
     contadorPendientes.textContent = pendientes;
+
+    console.log('[Contadores] Actualizados:', { total, comprados, pendientes });
 }
 
 // ============================================
@@ -249,18 +300,44 @@ function actualizarContadores() {
 function limpiarFormulario() {
     inputNombre.value = '';
     inputCantidad.value = '';
+    inputImagen.value = '';
     inputNombre.focus();
+    console.log('[Formulario] Campos limpiados');
+}
+
+/**
+ * Convierte un archivo de imagen a base64
+ * @param {File} archivo - Archivo de imagen
+ * @returns {Promise<string>} Promesa que resuelve con la imagen en base64
+ */
+function convertirImagenABase64(archivo) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            console.log('[Imagen] Imagen convertida a base64');
+            resolve(e.target.result);
+        };
+        reader.onerror = function(error) {
+            console.error('[Imagen] Error al convertir imagen:', error);
+            reject(error);
+        };
+        reader.readAsDataURL(archivo);
+    });
 }
 
 /**
  * Maneja el envío del formulario
  * @param {Event} evento - Evento del formulario
  */
-function manejarEnvioFormulario(evento) {
+async function manejarEnvioFormulario(evento) {
     evento.preventDefault();
+    console.log('[Formulario] Formulario enviado');
 
     const nombre = inputNombre.value;
     const cantidad = inputCantidad.value;
+    const archivoImagen = inputImagen.files[0];
+
+    console.log('[Formulario] Datos recibidos:', { nombre, cantidad, tieneImagen: !!archivoImagen });
 
     // Validar datos
     const error = validarFormulario(nombre, cantidad);
@@ -270,9 +347,20 @@ function manejarEnvioFormulario(evento) {
         return;
     }
 
+    // Procesar imagen si existe
+    let imagenBase64 = null;
+    if (archivoImagen) {
+        try {
+            console.log('[Imagen] Procesando imagen:', archivoImagen.name);
+            imagenBase64 = await convertirImagenABase64(archivoImagen);
+        } catch (err) {
+            console.error('[Imagen] Error al procesar imagen:', err);
+        }
+    }
+
     // Limpiar error y agregar producto
     limpiarError();
-    agregarProducto(nombre, cantidad);
+    agregarProducto(nombre, cantidad, imagenBase64);
     limpiarFormulario();
 }
 
@@ -284,6 +372,8 @@ function manejarEnvioFormulario(evento) {
  * Inicializa la aplicación
  */
 function inicializarApp() {
+    console.log('[App] Inicializando aplicación...');
+
     // Cargar productos desde localStorage
     productos = cargarDeStorage();
 
@@ -295,7 +385,13 @@ function inicializarApp() {
 
     // Agregar evento al formulario
     formProducto.addEventListener('submit', manejarEnvioFormulario);
+    console.log('[App] Evento submit registrado en el formulario');
+
+    console.log('[App] Aplicación inicializada correctamente');
 }
 
 // Ejecutar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', inicializarApp);
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('[App] DOM cargado completamente');
+    inicializarApp();
+});
