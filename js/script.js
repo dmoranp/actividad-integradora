@@ -17,6 +17,39 @@ let productos = [];
 const IMAGEN_DEFAULT = 'img/placeholder.jpg';
 
 // ============================================
+// CLASE PRODUCTO
+// ============================================
+
+/**
+ * Clase que representa un producto de la lista
+ */
+class Producto {
+    constructor(nombre, cantidad, imagen = IMAGEN_DEFAULT) {
+        this.id = this.generarId();
+        this.nombre = nombre.trim();
+        this.cantidad = parseInt(cantidad);
+        this.imagen = imagen || IMAGEN_DEFAULT;
+        this.comprado = false;
+    }
+
+    // Genera un ID único para el producto
+    generarId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // Devuelve información del producto
+    info() {
+        return `${this.nombre} (${this.cantidad}) - ${this.comprado ? 'Comprado' : 'Pendiente'}`;
+    }
+
+    // Alterna el estado de comprado
+    toggleComprado() {
+        this.comprado = !this.comprado;
+        return this.comprado;
+    }
+}
+
+// ============================================
 // REFERENCIAS AL DOM
 // ============================================
 
@@ -31,6 +64,11 @@ const contadorComprados = document.getElementById('contador-comprados');
 const contadorPendientes = document.getElementById('contador-pendientes');
 const mensajeVacio = document.getElementById('mensaje-vacio');
 const btnVaciar = document.getElementById('btn-vaciar');
+const mensajeExito = document.getElementById('mensaje-exito');
+const filtros = document.querySelectorAll('.btn-filtro');
+
+// Variable para el filtro activo
+let filtroActual = 'todos';
 
 // ============================================
 // FUNCIONES DE LOCALSTORAGE
@@ -47,13 +85,26 @@ function guardarEnStorage() {
 }
 
 /**
- * Carga los productos desde localStorage
+ * Carga los productos desde localStorage y los convierte en instancias de Producto
  * @returns {Array} Array de productos o array vacío si no hay datos
  */
 function cargarDeStorage() {
     const datos = localStorage.getItem(STORAGE_KEY);
-    const productosRecuperados = datos ? JSON.parse(datos) : [];
-    console.log('[localStorage] Datos cargados:', productosRecuperados);
+    if (!datos) {
+        console.log('[localStorage] No hay datos guardados');
+        return [];
+    }
+
+    // Convertir objetos del localStorage en instancias de la clase Producto
+    const datosParseados = JSON.parse(datos);
+    const productosRecuperados = datosParseados.map(function(item) {
+        const producto = new Producto(item.nombre, item.cantidad, item.imagen);
+        producto.id = item.id; // Mantener el ID original
+        producto.comprado = item.comprado; // Mantener el estado de comprado
+        return producto;
+    });
+
+    console.log('[localStorage] Datos cargados:', productosRecuperados.length, 'productos');
     return productosRecuperados;
 }
 
@@ -73,6 +124,12 @@ function validarFormulario(nombre, cantidad) {
     if (!nombre || nombre.trim() === '') {
         console.warn('[Validación] Error: Nombre vacío');
         return 'Por favor, ingresa el nombre del producto.';
+    }
+
+    // Validar que el nombre solo contenga letras y espacios
+    if (!regexNombreValido.test(nombre.trim())) {
+        console.warn('[Validación] Error: Nombre con caracteres inválidos');
+        return 'El nombre solo puede contener letras y espacios.';
     }
 
     if (!cantidad || cantidad < 1) {
@@ -101,40 +158,43 @@ function limpiarError() {
     console.log('[Error] Mensaje de error limpiado');
 }
 
+/**
+ * Muestra un mensaje de éxito temporalmente
+ * @param {string} mensaje - Mensaje a mostrar
+ */
+function mostrarExito(mensaje) {
+    mensajeExito.textContent = mensaje;
+    mensajeExito.classList.add('visible');
+    console.log('[Éxito] Mostrando mensaje:', mensaje);
+
+    // Ocultar después de 2 segundos
+    setTimeout(function() {
+        mensajeExito.classList.remove('visible');
+        mensajeExito.textContent = '';
+    }, 2000);
+}
+
 // ============================================
 // FUNCIONES DE PRODUCTOS
 // ============================================
 
 /**
- * Genera un ID único para cada producto
- * @returns {string} ID único
- */
-function generarId() {
-    const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
-    console.log('[ID] Nuevo ID generado:', id);
-    return id;
-}
-
-/**
- * Agrega un nuevo producto a la lista
+ * Agrega un nuevo producto a la lista usando la clase Producto
  * @param {string} nombre - Nombre del producto
  * @param {number} cantidad - Cantidad del producto
  * @param {string} imagen - URL de la imagen del producto
  */
 function agregarProducto(nombre, cantidad, imagen) {
-    const producto = {
-        id: generarId(),
-        nombre: nombre.trim(),
-        cantidad: parseInt(cantidad),
-        imagen: imagen || IMAGEN_DEFAULT,
-        comprado: false
-    };
+    // Crear nueva instancia de la clase Producto
+    const producto = new Producto(nombre, cantidad, imagen);
 
-    console.log('[Producto] Agregando nuevo producto:', producto);
+    console.log('[Producto] Agregando nuevo producto:', producto.info());
     productos.push(producto);
     guardarEnStorage();
     renderizarProducto(producto);
     actualizarContadores();
+    filtrarProductos(filtroActual); // Reaplicar filtro actual
+    mostrarExito('¡Producto "' + producto.nombre + '" agregado correctamente!');
     console.log('[Producto] Producto agregado exitosamente. Total de productos:', productos.length);
 }
 
@@ -186,17 +246,15 @@ function vaciarLista() {
 }
 
 /**
- * Alterna el estado de comprado de un producto
+ * Alterna el estado de comprado de un producto usando el método de la clase
  * @param {string} id - ID del producto
  */
 function toggleComprado(id) {
     const producto = productos.find(p => p.id === id);
     if (producto) {
-        producto.comprado = !producto.comprado;
-        console.log('[Producto] Estado de compra cambiado:', {
-            nombre: producto.nombre,
-            comprado: producto.comprado
-        });
+        // Usar el método de la clase Producto
+        producto.toggleComprado();
+        console.log('[Producto] Estado de compra cambiado:', producto.info());
 
         guardarEnStorage();
 
@@ -208,6 +266,7 @@ function toggleComprado(id) {
         }
 
         actualizarContadores();
+        filtrarProductos(filtroActual); // Reaplicar filtro actual
     }
 }
 
@@ -268,6 +327,7 @@ function renderizarProducto(producto) {
     const btnEliminar = document.createElement('button');
     btnEliminar.classList.add('btn-eliminar');
     btnEliminar.textContent = 'Eliminar';
+    btnEliminar.setAttribute('aria-label', 'Eliminar ' + producto.nombre + ' de la lista');
     btnEliminar.addEventListener('click', function() {
         console.log('[Evento] Click en botón eliminar para:', producto.nombre);
         eliminarProducto(producto.id);
@@ -278,8 +338,15 @@ function renderizarProducto(producto) {
     li.appendChild(infoDiv);
     li.appendChild(btnEliminar);
 
-    // Agregar li a la lista
+    // Agregar li a la lista con animación
+    li.classList.add('nuevo');
     listaProductos.appendChild(li);
+
+    // Remover clase de animación después de que termine
+    setTimeout(function() {
+        li.classList.remove('nuevo');
+    }, 300);
+
     console.log('[DOM] Producto agregado al DOM:', producto.nombre);
 }
 
@@ -333,6 +400,108 @@ function actualizarVisibilidadLista() {
 }
 
 // ============================================
+// FUNCIONES DE FILTRADO
+// ============================================
+
+/**
+ * Filtra los productos según el filtro seleccionado
+ * @param {string} filtro - Tipo de filtro: 'todos', 'pendientes', 'comprados'
+ */
+function filtrarProductos(filtro) {
+    filtroActual = filtro;
+    console.log('[Filtro] Aplicando filtro:', filtro);
+
+    const elementosLista = listaProductos.querySelectorAll('li');
+
+    elementosLista.forEach(function(elemento) {
+        const id = elemento.getAttribute('data-id');
+        const producto = productos.find(p => p.id === id);
+
+        if (!producto) return;
+
+        // Determinar si debe mostrarse según el filtro
+        let mostrar = false;
+
+        if (filtro === 'todos') {
+            mostrar = true;
+        } else if (filtro === 'pendientes') {
+            mostrar = !producto.comprado;
+        } else if (filtro === 'comprados') {
+            mostrar = producto.comprado;
+        }
+
+        // Aplicar clase oculto
+        if (mostrar) {
+            elemento.classList.remove('oculto');
+        } else {
+            elemento.classList.add('oculto');
+        }
+    });
+
+    // Actualizar botones de filtro
+    filtros.forEach(function(btn) {
+        if (btn.getAttribute('data-filtro') === filtro) {
+            btn.classList.add('activo');
+        } else {
+            btn.classList.remove('activo');
+        }
+    });
+
+    console.log('[Filtro] Filtro aplicado correctamente');
+}
+
+// ============================================
+// VALIDACIÓN EN TIEMPO REAL
+// ============================================
+
+// Expresión regular para validar nombres (solo letras, espacios y acentos)
+const regexNombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+
+/**
+ * Valida el nombre del producto mientras el usuario escribe
+ */
+function validarNombreEnTiempoReal() {
+    const nombre = inputNombre.value.trim();
+
+    if (nombre.length === 0) {
+        inputNombre.style.borderColor = '#ddd';
+        return;
+    }
+
+    // Validar longitud mínima y que solo contenga letras
+    if (nombre.length < 2) {
+        inputNombre.style.borderColor = '#e74c3c';
+        console.log('[Validación tiempo real] Nombre muy corto:', nombre.length);
+    } else if (!regexNombreValido.test(nombre)) {
+        inputNombre.style.borderColor = '#e74c3c';
+        console.log('[Validación tiempo real] Nombre con caracteres inválidos');
+    } else {
+        inputNombre.style.borderColor = '#27ae60';
+        console.log('[Validación tiempo real] Nombre válido');
+    }
+}
+
+/**
+ * Valida la cantidad mientras el usuario escribe
+ */
+function validarCantidadEnTiempoReal() {
+    const cantidad = parseInt(inputCantidad.value);
+
+    if (inputCantidad.value === '') {
+        inputCantidad.style.borderColor = '#ddd';
+        return;
+    }
+
+    if (isNaN(cantidad) || cantidad < 1) {
+        inputCantidad.style.borderColor = '#e74c3c';
+        console.log('[Validación tiempo real] Cantidad inválida:', cantidad);
+    } else {
+        inputCantidad.style.borderColor = '#27ae60';
+        console.log('[Validación tiempo real] Cantidad válida');
+    }
+}
+
+// ============================================
 // FUNCIONES DE FORMULARIO
 // ============================================
 
@@ -343,6 +512,9 @@ function limpiarFormulario() {
     inputNombre.value = '';
     inputCantidad.value = '';
     inputImagen.value = '';
+    // Resetear estilos de validación
+    inputNombre.style.borderColor = '#ddd';
+    inputCantidad.style.borderColor = '#ddd';
     inputNombre.focus();
     console.log('[Formulario] Campos limpiados');
 }
@@ -430,9 +602,24 @@ function inicializarApp() {
     formProducto.addEventListener('submit', manejarEnvioFormulario);
     console.log('[App] Evento submit registrado en el formulario');
 
+    // Agregar validación en tiempo real (mientras el usuario escribe)
+    inputNombre.addEventListener('input', validarNombreEnTiempoReal);
+    inputCantidad.addEventListener('input', validarCantidadEnTiempoReal);
+    console.log('[App] Validación en tiempo real activada');
+
     // Agregar evento al botón vaciar
     btnVaciar.addEventListener('click', vaciarLista);
     console.log('[App] Evento click registrado en botón vaciar');
+
+    // Agregar eventos a los filtros
+    filtros.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const filtro = this.getAttribute('data-filtro');
+            console.log('[Evento] Click en filtro:', filtro);
+            filtrarProductos(filtro);
+        });
+    });
+    console.log('[App] Eventos de filtros registrados');
 
     // Actualizar visibilidad inicial
     actualizarVisibilidadLista();
