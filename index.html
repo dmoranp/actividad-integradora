@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Codificación de caracteres UTF-8 para soportar acentos y ñ -->
     <meta charset="UTF-8">
+    <!-- Configuración del viewport para diseño responsive -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Metaetiquetas SEO para descripción y palabras clave -->
+    <meta name="description" content="Aplicación web para gestionar tu lista de compras del supermercado. Agrega, elimina y marca productos como comprados.">
+    <meta name="keywords" content="lista de compras, supermercado, organizar compras, lista de supermercado">
+    <meta name="author" content="Denny Javier Morán Pérez">
+    <!-- Color de tema para navegadores móviles -->
+    <meta name="theme-color" content="#2c3e50">
     <title>Lista de Supermercado</title>
-    <!-- Fuente externa de Google Fonts -->
+    <!-- Fuente externa de Google Fonts - Poppins para tipografía moderna -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Enlace al archivo de estilos -->
+    <!-- Enlace al archivo de estilos CSS externo -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -22,36 +30,53 @@
         <!-- Sección del formulario para agregar productos -->
         <section id="formulario-section">
             <h2>Agregar Producto</h2>
+            <!-- Formulario con campos de texto, número e imagen -->
             <form id="form-producto">
+                <!-- Campo de texto para el nombre del producto -->
                 <div class="form-group">
                     <label for="nombre-producto">Nombre del producto:</label>
-                    <input type="text" id="nombre-producto" name="nombre" placeholder="Ej: Leche">
+                    <input type="text" id="nombre-producto" name="nombre" placeholder="Ej: Leche" required aria-required="true">
                 </div>
+                <!-- Campo numérico para la cantidad (mínimo 1) -->
                 <div class="form-group">
                     <label for="cantidad-producto">Cantidad:</label>
-                    <input type="number" id="cantidad-producto" name="cantidad" min="1" placeholder="1">
+                    <input type="number" id="cantidad-producto" name="cantidad" min="1" placeholder="1" required aria-required="true">
                 </div>
+                <!-- Campo opcional para subir imagen del producto -->
                 <div class="form-group">
                     <label for="imagen-producto">Imagen (opcional):</label>
                     <input type="file" id="imagen-producto" name="imagen" accept="image/*">
                 </div>
-                <button type="submit" id="btn-agregar">Agregar</button>
+                <!-- Botón de envío del formulario -->
+                <button type="submit" id="btn-agregar" aria-label="Agregar producto a la lista">Agregar</button>
             </form>
-            <!-- Contenedor para mensajes de error -->
+            <!-- Contenedor para mostrar mensajes de error de validación -->
             <div id="mensaje-error" class="error-mensaje"></div>
+            <!-- Contenedor para mostrar mensajes de éxito al agregar -->
+            <div id="mensaje-exito" class="exito-mensaje"></div>
         </section>
 
         <!-- Sección de la lista de productos -->
         <section id="lista-section">
             <h2>Productos</h2>
-            <!-- Contenedor de contadores -->
+            <!-- Contadores: muestran el total, comprados y pendientes en tiempo real -->
             <div id="contadores" class="contadores">
                 <span>Total: <strong id="contador-total">0</strong></span>
                 <span>Comprados: <strong id="contador-comprados">0</strong></span>
                 <span>Pendientes: <strong id="contador-pendientes">0</strong></span>
             </div>
-            <!-- Lista dinámica de productos -->
+            <!-- Botones de filtro: permiten mostrar productos según su estado -->
+            <div id="filtros" class="filtros">
+                <button class="btn-filtro activo" data-filtro="todos" aria-label="Mostrar todos los productos">Todos</button>
+                <button class="btn-filtro" data-filtro="pendientes" aria-label="Mostrar solo productos pendientes">Pendientes</button>
+                <button class="btn-filtro" data-filtro="comprados" aria-label="Mostrar solo productos comprados">Comprados</button>
+            </div>
+            <!-- Lista dinámica: aquí se insertan los productos con JavaScript (createElement) -->
             <ul id="lista-productos" class="lista-productos"></ul>
+            <!-- Mensaje que se muestra cuando no hay productos en la lista -->
+            <p id="mensaje-vacio" class="mensaje-vacio">Tu lista está vacía. ¡Agrega tu primer producto!</p>
+            <!-- Botón para eliminar todos los productos de la lista -->
+            <button id="btn-vaciar" class="btn-vaciar" aria-label="Vaciar toda la lista de productos">Vaciar lista</button>
         </section>
     </main>
 
